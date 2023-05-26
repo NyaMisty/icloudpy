@@ -128,10 +128,11 @@ class PhotosService:
         },
     }
 
-    def __init__(self, service_root, session, params):
+    def __init__(self, service_root, upload_root, session, params):
         self.session = session
         self.params = dict(params)
         self._service_root = service_root
+        self._upload_root = upload_root
         self.service_endpoint = (
             f"{self._service_root}/database/1/com.apple.photos.cloud/production/private"
         )
@@ -230,6 +231,21 @@ class PhotosService:
     def all(self):
         """Returns all photos."""
         return self.albums["All Photos"]
+
+    def upload(self, f, filename, lastModDate=None, timezoneOffset=None):
+        """Upload a image to iCloud, lastModDate is timestamp in ms, timezoneOffset is JS's getTimezoneOffset"""
+        params = {
+            'filename': filename, 'dsid': self.session.service.data["dsInfo"]["dsid"],
+        }
+        if lastModDate:
+            params['lastModDate'] = lastModDate
+        if timezoneOffset:
+            params['timezoneOffset'] = timezoneOffset
+        request = self.session.post(
+            f"{self._upload_root}/upload", params=params, data=f, headers={"Content-type": "text/plain"}
+        )
+        response = request.json()
+        return response
 
 
 class PhotoAlbum:

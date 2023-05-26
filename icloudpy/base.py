@@ -579,7 +579,8 @@ class ICloudPyService:
         """Gets the 'Photo' service."""
         if not self._photos:
             service_root = self._get_webservice_url("ckdatabasews")
-            self._photos = PhotosService(service_root, self.session, self.params)
+            upload_root = self._get_webservice_url("uploadimagews")
+            self._photos = PhotosService(service_root, upload_root, self.session, self.params)
         return self._photos
 
     @property
